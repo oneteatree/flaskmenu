@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ clientname }} - Menu{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+    }
+    .menu-item-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        height: 100%;
+    }
+    .menu-item-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    .menu-item-image {
+        height: 180px;
+        object-fit: cover;
+    }
+    .category-header {
+        position: relative;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+    }
+    .category-header::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, #0d6efd, transparent);
+    }
+    .navbar-brand {
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4">{{ clientname }}</h1>
+        <p class="lead">Delicious food delivered to your door</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-outline-primary category-filter active" data-category="all">All</button>
+                {% for category in menu.categories %}
+                    <button class="btn btn-outline-secondary category-filter" data-category="{{ category }}">{{ category }}</button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    {% for category in menu.categories %}
+        {% set category_items = menu.items|selectattr('category', 'equalto', category)|list %}
+        {% if category_items %}
+            <h2 class="category-header">{{ category }}</h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4 category-section" data-category="{{ category }}">
+                {% for item in category_items %}
+                    <div class="col menu-item" data-category="{{ item.category }}">
+                        <div class="card menu-item-card">
+                            {% if item.image %}
+                                <img src="{{ url_for('uploaded_file', filename=item.image) }}" class="card-img-top menu-item-image" alt="{{ item.name }}">
+                            {% else %}
+                                <div class="card-img-top menu-item-image bg-light d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.name }}</h5>
+                                <p class="card-text text-muted">{{ item.ingredients }}</p>
+                            </div>
+                            <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                                <span class="h5 mb-0">${{ "%.2f"|format(item.price) }}</span>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+{% block extra_js %}
+<script>
+    // Category filtering
+    document.querySelectorAll('.category-filter').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const category = this.getAttribute('data-category');
+            
+            // Update active button
+            document.querySelectorAll('.category-filter').forEach(b => {
+                b.classList.remove('active');
+                b.classList.add('btn-outline-secondary');
+                b.classList.remove('btn-primary');
+            });
+            
+            this.classList.add('active');
+            this.classList.remove('btn-outline-secondary');
+            this.classList.add('btn-primary');
+            
+            // Show/hide items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Scroll to category if not "all"
+            if (category !== 'all') {
+                const categorySection = document.querySelector(`.category-section[data-category="${category}"]`);
+                if (categorySection) {
+                    categorySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    });
+    
+    // Simple cart functionality (would be enhanced in a real app)
+    document.querySelectorAll('.menu-item-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-primary')) {
+                e.stopPropagation();
+                const itemName = this.querySelector('.card-title').textContent;
+                const itemPrice = this.querySelector('.card-footer span').textContent;
+                alert(`Added ${itemName} (${itemPrice}) to cart`);
+                // In a real app, you would add to a cart system here
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

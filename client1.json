@@ -1,0 +1,29 @@
+{
+    "items": [
+        {
+            "id": 1,
+            "name": "Margherita Pizza",
+            "ingredients": "Tomato sauce, mozzarella, basil",
+            "price": 12.99,
+            "category": "Pizza",
+            "image": "client1_pizza1.jpg"
+        },
+        {
+            "id": 2,
+            "name": "Pepperoni Pizza",
+            "ingredients": "Tomato sauce, mozzarella, pepperoni",
+            "price": 14.99,
+            "category": "Pizza",
+            "image": "client1_pizza2.jpg"
+        },
+        {
+            "id": 3,
+            "name": "Caesar Salad",
+            "ingredients": "Romaine lettuce, croutons, parmesan, Caesar dressing",
+            "price": 8.99,
+            "category": "Salads",
+            "image": "client1_salad1.jpg"
+        }
+    ],
+    "categories": ["Pizza", "Salads"]
+}
